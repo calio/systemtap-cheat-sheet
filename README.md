@@ -26,6 +26,13 @@
 Note: all variable types are inferred, and that all locals and globals are
 initialized. Integers are set to 0 and strings are set to the empty string.
 
+### Probe a function:
+
+    probe PROBEPOINT [, PROBEPOINT] { [STMT ...] }
+
+    probe kernel.function("sys_mkdir").call { log ("enter") }
+    probe kernel.function("sys_mkdir").return { log ("exit") }
+
 ### User space probing:
 
     probe process(path).function(function_name)
@@ -42,6 +49,11 @@ initialized. Integers are set to 0 and strings are set to the empty string.
 
 ### Define a function:
 
+Syntax:
+
+    function <name>[:<type>] ( <arg1>[:<type>], ... ) { <stmts> }
+
+
     function isprime (x) {
         if (x < 2) return 0
         for (i = 2; i < x; i++) {
@@ -50,6 +62,9 @@ initialized. Integers are set to 0 and strings are set to the empty string.
         }
         return 1
     }
+
+C code can be embedded as embedded C functions. See "Embedded C functions" in
+*SystemTap Language Reference* for more details.
 
 ### Calling a function:
 
@@ -63,15 +78,25 @@ Note: function can be called recursively.
 
 ### Variable:
 
-#### function local variable:
+Target variables (or "context variables") are variables defined in the source
+code at that location. They are presented to the script as variables whose names
+are prefixed with a dollar sign ($).
+
+#### Target variable:
 
     $my_var
 
-#### SystemTap variable:
+#### SystemTap plain local variable:
 
     a = 1
 
 Note: all SystemTap variables have "long" type
+
+#### Variable types:
+
+Scalar variables are implicitly typed as either string or integer. Associative
+arrays also have a string or integer value, and a tuple of strings or integers
+serves as a key. Arrays must be declared as global. Local arrays are not allowed.
 
 ### Type casting:
 
@@ -98,6 +123,20 @@ Note: all SystemTap variables have "long" type
 
     printf("%d %p\n", num, pointer)
 
+### Probe aliases
+
+Prologue-style aliases
+
+    probe <alias> = <probepoint> { <prologue_stmts> }
+
+Epilogue-style aliases
+
+    probe <alias> += <probepoint> { <epilogue_stmts> }
+
+Execution order
+
+    prologue_stmts  ->  user statement block code  ->  epilogue_stmts
+
 ### Limits
 
 Limits are set by -D option:
@@ -118,4 +157,4 @@ Available limits are:
 
 ### TODO
 
-Chapter 2+ of https://sourceware.org/systemtap/langref.pdf
+Chapter 4+ of https://sourceware.org/systemtap/langref.pdf
