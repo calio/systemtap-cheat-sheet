@@ -174,13 +174,18 @@ serves as a key. Arrays must be declared as global. Local arrays are not allowed
     module(MPATTERN).statement(PATTERN)
 
 Note:
+
 * Inline functions do not have an identifiable return point, so .return is not supported on .inline probes.
 * MPATTERN: string literal that identifies the loaded kernel module of interest.
 * LPATTERN: source program label.
 * PATTERN: string literal that identifies a point in the program.
 
-    <function> [@ <abs_path>|<rel_path>] [:<abs_line_num> | +<rel_line_num> | :* | :<x>-<y> ]
-    | address
+        <function> [@ <abs_path>|<rel_path>] [:<abs_line_num> | +<rel_line_num> | :* | :<x>-<y> ]
+        | address
+* Examples:
+
+        process("/usr/local/sbin/nginx").statement("*@ngx_http_gunzip_filter_module.c:215")
+        process("/usr/local/sbin/nginx").statement("ngx_http_gunzip_force_header_filter@ngx_http_gunzip_force_filter_module.c+7")
 
 ### User space probing
 
